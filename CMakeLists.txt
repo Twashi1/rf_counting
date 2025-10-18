@@ -21,9 +21,9 @@ add_library(CountRFAcc MODULE "count.cpp")
 
 set_target_properties(CountRFAcc PROPERTIES COMPILE_FLAGS "-fno-rtti")
 
-# LLVM’s headers use warnings that GCC/Clang may complain about
+# disable specific warnings from LLVM headers
 target_compile_options(CountRFAcc PRIVATE -Wno-unused-command-line-argument)
 
-# Optional: show where to install the .so
+# explicitly set output dir
 set_target_properties(CountRFAcc PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
