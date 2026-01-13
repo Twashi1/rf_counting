@@ -1,29 +1,24 @@
 cmake_minimum_required(VERSION 3.13)
-project(RISCVRegFilePass LANGUAGES C CXX)
+project(RegisterAccessPostRAPass LANGUAGES CXX)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(LLVM 17 REQUIRED CONFIG)
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
+endif()
 
-list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
-include(HandleLLVMOptions)
-include(AddLLVM)  
+find_package(LLVM 22 REQUIRED CONFIG)
+
+message(STATUS "Using LLVM_DIR=${LLVM_DIR}")
+message(STATUS "LLVM include dirs: ${LLVM_INCLUDE_DIRS}")
 
 include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINTIONS})
+add_definitions(${LLVM_DEFINITIONS})
 
-# TODO: more cmake way of doing this?
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
+add_library(RegisterAccessPostRAPass MODULE RegisterAccessPostRAPass.cpp)
 
-add_library(CountRFAcc MODULE "count.cpp")
-
-set_target_properties(CountRFAcc PROPERTIES COMPILE_FLAGS "-fno-rtti")
-
-# disable specific warnings from LLVM headers
-target_compile_options(CountRFAcc PRIVATE -Wno-unused-command-line-argument)
-
-# explicitly set output dir
-set_target_properties(CountRFAcc PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-
+set_target_properties(RegisterAccessPostRAPass PROPERTIES
+  PREFIX ""
+  SUFFIX ".so"
+  POSITION_INDEPENDENT_CODE ON
+)
